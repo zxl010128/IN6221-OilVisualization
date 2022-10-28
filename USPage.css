@@ -1,0 +1,198 @@
+
+body {
+	margin: 0;
+}
+.ntulogo {
+	height: 50px;
+}
+
+.footerBox {
+	display: flex; 
+	flex-direction: row; 
+	justify-content: space-between; 
+	width: 100%; 
+	margin: 10px auto;
+	padding: 0 20px 10px 30px;
+}
+
+.sign {
+	font-size: 20px;
+	margin-left: 0px;
+	font-family: 'Lucida Grande';
+	font-weight: 700
+}
+
+.footerLeft {
+	display: flex;
+	flex-direction: column;
+	margin-left: 20px;
+}
+
+.footerleftarea {
+	display: flex;
+	flex-direction: row;
+	font-size: 15px;
+	align-items: center;
+	font-family: 'Lucida Grande';
+}
+
+.gameviewLogo {
+	width: 80px;
+	margin-top: 20px;
+}
+
+.contentContainer {
+	width: 100%;
+	background-color: #E8E3D9;
+	display: flex;
+	flex-direction: column;
+
+}
+
+.overviewtitle {
+	margin: 50px auto;
+	font-size: 50px;
+	font-weight: 900;
+}
+
+.node circle {
+	stroke: #3a403d;
+	stroke-width: .5px;
+}
+
+text.title{
+	font-size: 24px;
+	font-weight: 500;
+}
+text.subTitle{
+	font-size: 14px;
+	font-weight: 300;
+	fill: #777777;
+}
+
+text.caption{
+	font-weight: 400;
+	font-size: 14px;
+	fill: #777777;
+ }
+ text.label{
+	font-weight: 600;
+ }
+
+ text.valueLabel{
+	font-weight: 300;
+ }
+
+ text.yearText{
+	font-size: 64px;
+	font-weight: 700;
+	opacity: 0.25;
+ }
+ .tick text {
+	fill: #777777;
+ }
+ .xAxis .tick:nth-child(2) text {
+	text-anchor: start;
+ }
+ .tick line {
+	shape-rendering: CrispEdges;
+	stroke: #dddddd;
+ }
+ .tick line.origin{
+	stroke: #aaaaaa;
+ }
+ path.domain{
+	display: none;
+ }
+
+div.tooltip {     
+	position: absolute;         
+	text-align: center;         
+	width: 150px;                    
+	height: 30px;                   
+	padding: 2px;               
+	font: 12px sans-serif;      
+	background: white; 
+	border: 0px;        
+	border-radius: 8px;         
+	pointer-events: none;           
+}
+
+.svg5 {
+	width: 1500px; 
+	height: 880px; 
+	background-color: white;
+	align-self: center;
+	padding: 120px 60px 60px 200px;
+	border-radius: 20px;
+	box-shadow: 5px 5px 10px -4px black;
+}
+
+.USfirstBox {
+    display: flex;
+    flex-direction: row;
+    align-self: center;
+    justify-content: space-between;
+    width: 1500px;
+}
+
+.middleText {
+    font-size: 30px;
+    font-weight: 700;
+    font-family: 'Lucida Grande';
+}
+
+.svg6 {
+	margin-top: 50px;
+	width: 740px; 
+	height: 880px; 
+	background-color: white;
+	align-self: center;
+	padding: 80px 60px 60px 0px;
+	border-radius: 20px;
+	box-shadow: 5px 5px 10px -4px black;
+}
+
+.svg7 {
+	margin-top: 50px;
+	width: 740px; 
+	height: 880px; 
+	background-color: white;
+	align-self: center;
+	padding: 80px 60px 60px 20px;
+	border-radius: 20px;
+	box-shadow: 5px 5px 10px -4px black;
+}
+
+.USsecondBox {
+    display: flex;
+    flex-direction: row;
+    align-self: center;
+    justify-content: space-between;
+    width: 1500px;
+}
+
+
+.svg8 {
+	margin-top: 50px;
+    margin-bottom: 50px;
+	width: 850px; 
+	height: 880px; 
+	background-color: white;
+	align-self: center;
+	padding: 150px 60px 60px 0px;
+	border-radius: 20px;
+	box-shadow: 5px 5px 10px -4px black;
+}
+
+.svg9 {
+	margin-top: 50px;
+    margin-bottom: 50px;
+	width: 630px; 
+	height: 880px; 
+	background-color: white;
+	align-self: center;
+	padding: 150px 60px 60px 20px;
+	border-radius: 20px;
+	box-shadow: 5px 5px 10px -4px black;
+}

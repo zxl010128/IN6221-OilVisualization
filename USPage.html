@@ -1,0 +1,872 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href="/USPage.css" rel="stylesheet" type="text/css">
+		<meta charset="UTF-8">
+		<title>OilView</title>
+	</head>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+	<!-- JavaScript Bundle with Popper -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+	<script src="https://d3js.org/d3.v7.min.js"></script> 
+ 	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.24.0/d3-legend.js"></script>
+
+	<body>
+		
+		<nav class="navbar navbar-expand-lg" style="width: 100%; background-color: #063273;">
+			<div class="container-fluid">
+				<a class="navbar-brand" style="color: white;" >Navbar</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+				<div class="navbar-nav" >
+					<a class="nav-link" style="color: white; cursor: pointer" onclick="OverToOver()">OverView</a>
+					<a class="nav-link" style="color: white; cursor: pointer" onclick="OverToUS()">U.S</a>
+				</div>
+				</div>
+			</div>
+		</nav>
+
+		<div class="contentContainer">
+			<h3 class="overviewtitle">
+				Overview of the U.S. oil information 
+			</h3>
+
+			<div class="svg5">
+				<svg id="my_dataviz5" width="1000" height="900"></svg>
+			</div>
+
+            <div class="USfirstBox">
+                <div class="svg6">
+                    <svg id="my_dataviz6" width="700" height="750"></svg>
+                </div>
+                <div class="svg7">
+                    <svg id="my_dataviz7" width="700" height="750"></svg>
+                </div>
+            </div>
+
+            <div class="USsecondBox">
+                <div class="svg8">
+                </div>
+                <div class="svg9">
+                    <svg id="my_dataviz9" width="700" height="750"></svg>
+                </div>
+            </div>
+
+		</div>
+
+			<nav class="navbar" style="width: 100%; background-color: #063273; color: white; padding-top: 10px">
+				<div class="container-fluid" style="display: flex; flex-direction: column;">
+				  <hr style="width:98%; align-self: center; background-color: white; border: 0; border-bottom: 4px solid white; margin: 4px 0">
+				  <div class="footerBox">
+					  <div class="footerleftarea">
+						  <img src="/icons/NTU_Logo.png" class="ntulogo" />
+						  <div class="footerLeft">
+							  <span class="sign">
+									WKWSCI IN6221 Team 2
+							  </span>
+							  <span style="margin-top: 15px">Zhang Xinlei</span>
+							  <span>Ma Wei</span>
+							  <span>Long Yu</span>
+							  <span>Chen Yunyi</span>
+						  </div>
+	  
+					  </div>	
+				  </div>
+	  
+				</div>
+			  </nav>
+		</div>
+		
+		
+	
+	</body>
+
+	<script>
+
+		const createSvg5 = () => {
+            // set the dimensions and margins of the graph
+            const margin = {top: 60, right: 400, bottom: 50, left: 70},
+                    width = 1000 - margin.left - margin.right,
+                    height = 600 - margin.top - margin.bottom;
+
+            // append the svg object to the body of the page
+            const svg = d3.select("#my_dataviz5")
+                    .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform",
+                            `translate(${margin.left}, ${margin.top + 50})`);
+
+            let title = svg.append('text')
+                .attr('class', 'title')
+                .attr('x', -20)
+                .attr('y', -70)
+                .html('Production of oil comparison by states in the U.S.');
+
+                let subTitle = svg.append("text")
+                .attr("class", "subTitle")
+                .attr("y", -50)
+                .attr('x', -20)
+                .html("Percentage change in U.S. crude oil production by state over time");
+            // Parse the Data
+            d3.csv("data/oma.csv").then( function(data) {
+
+
+                //////////
+                // GENERAL //
+                //////////
+
+                // List of groups = header of the csv files
+                const keys = data.columns.slice(1)
+
+                // color palette
+                const color = d3.scaleOrdinal()
+                        .domain(keys)
+                        .range(d3.schemeBlues[9]);
+
+                //stack the data?
+                const stackedData = d3.stack()
+                        .keys(keys)
+                        (data)
+
+
+
+                //////////
+                // AXIS //
+                //////////
+
+                // Add X axis
+                const x = d3.scaleLinear()
+                        .domain(d3.extent(data, function(d) { return d.year; }))
+                        .range([ 0, width ]);
+                const xAxis = svg.append("g")
+                        .attr("transform", `translate(0, ${height - 50})`)
+                        .call(d3.axisBottom(x).ticks(5))
+
+                // Add X axis label:
+                svg.append("text")
+                        .attr("text-anchor", "end")
+                        .attr("x", width)
+                        .attr("y", height-10)
+                        .text("Time (year)");
+
+                // Add Y axis label:
+                svg.append("text")
+                        .attr("text-anchor", "end")
+                        .attr("x", 0)
+                        .attr("y", -15 )
+                        .text("Production")
+                        .attr("text-anchor", "start")
+
+                // Add Y axis
+                const y = d3.scaleLinear()
+                        .domain([0, 1])
+                        .range([ height - 50, 0 ]);
+                svg.append("g")
+                        .call(d3.axisLeft(y).ticks(5))
+
+
+
+                //////////
+                // BRUSHING AND CHART //
+                //////////
+
+                // Add a clipPath: everything out of this area won't be drawn.
+                const clip = svg.append("defs").append("svg:clipPath")
+                        .attr("id", "clip")
+                        .append("svg:rect")
+                        .attr("width", width )
+                        .attr("height", height )
+                        .attr("x", 0)
+                        .attr("y", 0);
+
+                // Add brushing
+                const brush = d3.brushX()                 // Add the brush feature using the d3.brush function
+                        .extent( [ [0,0], [width,height] ] ) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+                        .on("end", updateChart) // Each time the brush selection changes, trigger the 'updateChart' function
+
+                // Create the scatter variable: where both the circles and the brush take place
+                const areaChart = svg.append('g')
+                        .attr("clip-path", "url(#clip)")
+
+                // Area generator
+                const area = d3.area()
+                        .x(function(d) { return x(d.data.year); })
+                        .y0(function(d) { return y(d[0]); })
+                        .y1(function(d) { return y(d[1]); })
+
+                // Show the areas
+                areaChart
+                        .selectAll("mylayers")
+                        .data(stackedData)
+                        .join("path")
+                        .attr("class", function(d) {
+                            names=d.key.split(' ')
+                            // console.log("****"+names[0]+"***")
+                            return "myArea " + names[0]})
+                        .style("fill", function(d) { return color(d.key); })
+                        .attr("d", area)
+
+                // Add the brushing
+                areaChart
+                        .append("g")
+                        .attr("class", "brush")
+                        .call(brush);
+
+                let idleTimeout
+                function idled() { idleTimeout = null; }
+
+                // A function that update the chart for given boundaries
+                function updateChart(event,d) {
+
+                extent = event.selection
+
+                // If no selection, back to initial coordinate. Otherwise, update X axis domain
+                if(!extent){
+                    if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
+                    x.domain(d3.extent(data, function(d) { return d.year; }))
+                }else{
+                    x.domain([ x.invert(extent[0]), x.invert(extent[1]) ])
+                    areaChart.select(".brush").call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
+                }
+
+                // Update axis and area position
+                xAxis.transition().duration(1000).call(d3.axisBottom(x).ticks(5))
+                areaChart
+                        .selectAll("path")
+                        .transition().duration(1000)
+                        .attr("d", area)
+                }
+
+
+
+                //////////
+                // HIGHLIGHT GROUP //
+                //////////
+
+                // What to do when one group is hovered
+                const highlight = function(event,d){
+
+                    names=d.split(' ')
+                    // console.log(names[0])
+                // reduce opacity of all groups
+
+                    d3.select("."+names[0]).style("fill", '#5976ba')
+                d3.selectAll(".myArea").style("opacity", .05)
+                // expect the one that is hovered
+                d3.select("."+names[0]).style("opacity", 1)
+                }
+                const mousemove = function(event, d) {
+                    names=d.split(' ')
+                    d3.select("."+names[0]).style("fill", function(d){ return color(d)})
+                }
+                // And when it is not hovered anymore
+                const noHighlight = function(event,d){
+                    names=d.split(' ')
+
+                    // console.log(111111111)
+                    // console.log(names[0])
+                    // console.log(color(d))
+
+                    d3.select("."+names[0]).style("fill", color(d))
+                d3.selectAll(".myArea").style("opacity", 1)
+
+                }
+
+
+
+                //////////
+                // LEGEND //
+                //////////
+
+                const keys1 = data.columns.slice(1,22)
+                const keys2 = data.columns.slice(23)
+                // Add one dot in the legend for each name.
+                const size = 20
+                svg.selectAll("myrect")
+                        .data(keys1)
+                        .join("rect")
+                        .attr("x", 580)
+                        .attr("y", function(d,i){ return 10 + i*(size+3)}) // 100 is where the first dot appears. 25 is the distance between dots
+                        .attr("width", size)
+                        .attr("height", size)
+                        .style("fill", function(d){ return color(d)})
+                        .on("mouseover", highlight)
+                        .on("mouseleave", noHighlight)
+                        // .on("mousemove", mousemove)
+
+                // Add one dot in the legend for each name.
+                svg.selectAll("mylabels")
+                        .data(keys1)
+                        .join("text")
+                        .attr("x", 580 + size*1.2)
+                        .attr("y", function(d,i){ return 10 + i*(size+3) + (size/2)}) // 100 is where the first dot appears. 25 is the distance between dots
+                        .style("fill", function(d){ return color(d)})
+                        .text(function(d){ return d})
+                        .attr("text-anchor", "left")
+                        .style("alignment-baseline", "middle")
+                        .on("mouseover", highlight)
+                        .on("mouseleave", noHighlight)
+                        // .on("mousemove", mousemove)
+
+
+                //line2
+                svg.selectAll("myrect")
+                        .data(keys2)
+                        .join("rect")
+                        .attr("x", 750)
+                        .attr("y", function(d,i){ return 10 + i*(size+3)}) // 100 is where the first dot appears. 25 is the distance between dots
+                        .attr("width", size)
+                        .attr("height", size)
+                        .style("fill", function(d){ return color(d)})
+                        .on("mouseover", highlight)
+                        .on("mouseleave", noHighlight)
+                    // .on("mousemove", mousemove)
+
+                // Add one dot in the legend for each name.
+                svg.selectAll("mylabels")
+                        .data(keys2)
+                        .join("text")
+                        .attr("x", 750 + size*1.2)
+                        .attr("y", function(d,i){ return 10 + i*(size+3) + (size/2)}) // 100 is where the first dot appears. 25 is the distance between dots
+                        .style("fill", function(d){ return color(d)})
+                        .text(function(d){ return d})
+                        .attr("text-anchor", "left")
+                        .style("alignment-baseline", "middle")
+                        .on("mouseover", highlight)
+                        .on("mouseleave", noHighlight)
+                        // .on("mousemove", mousemove)
+
+            })
+			
+
+		}
+
+		const createSvg6 = () => {
+			
+            // set the dimensions and margins of the graph
+                const width = 800,
+                height = 800,
+                margin = 150;
+            
+            // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
+            const radius = Math.min(width, height) / 2 - margin
+            
+            // append the svg object to the div called 'my_dataviz'
+            const svg = d3.select("#my_dataviz6")
+            .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+            .append("g")
+                .attr("transform", `translate(${width/2 - 40},${height/2})`);
+            
+            let title = svg.append('text')
+            .attr('class', 'title')
+            .attr('x', -300)
+            .attr('y', -300)
+            .html('U.S. Oil Importing Countries in OPEC');
+
+            let subTitle = svg.append("text")
+            .attr("class", "subTitle")
+            .attr("y", -280)
+            .attr('x', -300)
+            .html("Top 10 U.S. Oil Imports in OPEC Countries as a Percentage");
+            // Create dummy data
+            const data = {'Saudi Arabia': 0.28, Venezuela:0.25,  Nigeria: 0.15, 'Angola': 0.02, 'Other OPEC':0.08, 'Iraq':0.06, Kuwait:0.04, Libya:0.02, 'Algeria': 0.08, 'Ecuador': 0.02}
+            
+            // set the color scale
+            const color = d3.scaleOrdinal()
+            .domain(["a", "b", "c", "d", "e", "f", "g", "h"])
+            .range(d3.schemeAccent);
+            
+            // Compute the position of each group on the pie:
+            const pie = d3.pie()
+            .sort(null) // Do not sort group by size
+            .value(d => d[1])
+            const data_ready = pie(Object.entries(data))
+            
+            // The arc generator
+            const arc = d3.arc()
+            .innerRadius(radius * 0.5)         // This is the size of the donut hole
+            .outerRadius(radius * 0.8)
+            
+            // Another arc that won't be drawn. Just for labels positioning
+            const outerArc = d3.arc()
+            .innerRadius(radius * 0.9)
+            .outerRadius(radius * 0.9) 
+            
+            // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+            svg
+            .selectAll('allSlices')
+            .data(data_ready)
+            .join('path')
+            .attr('d', arc)
+            .attr('fill', d => color(d.data[1]))
+            .attr("stroke", "white")
+            .style("stroke-width", "2px")
+            .style("opacity", 0.7)
+            .on("mouseover", function(d,i) {
+                svg.select(".middleText").text(`${parseInt(i.value * 100)}%`)
+            })
+            .on("mouseout", function(d) {
+                svg.select(".middleText").text(null)
+            })
+            .transition()
+            .ease(d3.easeLinear)
+            .duration(2000)
+            .attrTween("d",pieTween)
+            
+            svg.append("text")
+            .attr("class", "middleText")
+            .attr("text-anchor", "middle");
+            
+            function pieTween(b){
+                b.innerRadius = 0;
+                var i = d3.interpolate({startAngle:0,endAngle:0},b);
+                return function(t) {return arc(i(t));};
+            }
+            
+            setTimeout(function(){
+            // Add the polylines between chart and labels:
+            svg
+                .selectAll('allPolylines')
+                .data(data_ready)
+                .join('polyline')
+                .attr("stroke", "black")
+                .style("fill", "none")
+                .attr("stroke-width", 1)
+                .attr('points', function(d) {
+                    const posA = arc.centroid(d) // line insertion in the slice
+                    const posB = outerArc.centroid(d) // line break: we use the other arc generator that has been built only for that
+                    const posC = outerArc.centroid(d); // Label position = almost the same as posB
+                    const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2 // we need the angle to see if the X position will be at the extreme right or extreme left
+                    posC[0] = radius * 0.95 * (midangle < Math.PI ? 1 : -1); // multiply by 1 or -1 to put it on the right or on the left
+                    return [posA, posB, posC]
+                })
+            
+            // Add the polylines between chart and labels:
+            svg
+                .selectAll('allLabels')
+                .data(data_ready)
+                .join('text')
+                .text(d => d.data[0])
+                .attr('transform', function(d) {
+                    const pos = outerArc.centroid(d);
+                    const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+                    pos[0] = radius * 0.99 * (midangle < Math.PI ? 1 : -1);
+                    return `translate(${pos})`;
+                })
+                .style('text-anchor', function(d) {
+                    const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+                    return (midangle < Math.PI ? 'start' : 'end')
+                })
+            }, 2000);   
+
+		}
+
+		const createSvg7 = () => {
+			// set the dimensions and margins of the graph
+            const width = 800,
+                height = 800,
+                margin = 150;
+            
+            // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
+            const radius = Math.min(width, height) / 2 - margin
+            
+            // append the svg object to the div called 'my_dataviz'
+            const svg = d3.select("#my_dataviz7")
+            .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+            .append("g")
+                .attr("transform", `translate(${width/2 - 20},${height/2})`);
+            
+            let title = svg.append('text')
+            .attr('class', 'title')
+            .attr('x', -300)
+            .attr('y', -300)
+            .html('U.S. Oil Importing Countries in NON-OPEC');
+
+            let subTitle = svg.append("text")
+            .attr("class", "subTitle")
+            .attr("y", -280)
+            .attr('x', -300)
+            .html("Top 10 U.S. Oil Imports in NON-OPEC Countries as a Percentage");
+            // Create dummy data
+            const data = {Canada: 0.33, Brazil:0.02,  Mexico: 0.18, 'U.S.VirginIslands': 0.05, 'U.K.':0.05, Colombia:0.04, Russia:0.03, Norway:0.03, 'Non-OPEC': 0.25, 'Netherlands': 0.02}
+            
+            // set the color scale
+            const color = d3.scaleOrdinal()
+            .domain(["a", "b", "c", "d", "e", "f", "g", "h"])
+            .range(d3.schemeSpectral[10]);
+            
+            // Compute the position of each group on the pie:
+            const pie = d3.pie()
+            .sort(null) // Do not sort group by size
+            .value(d => d[1])
+            const data_ready = pie(Object.entries(data))
+            
+            // The arc generator
+            const arc = d3.arc()
+            .innerRadius(radius * 0.5)         // This is the size of the donut hole
+            .outerRadius(radius * 0.8)
+            
+            // Another arc that won't be drawn. Just for labels positioning
+            const outerArc = d3.arc()
+            .innerRadius(radius * 0.9)
+            .outerRadius(radius * 0.9) 
+
+            // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+            svg
+            .selectAll('allSlices')
+            .data(data_ready)
+            .join('path')
+            .attr('d', arc)
+            .attr('fill', d => color(d.data[1]))
+            .attr("stroke", "white")
+            .style("stroke-width", "2px")
+            .style("opacity", 0.7)
+            .on("mouseover", function(d,i) {
+                svg.select(".middleText").text(`${parseInt(i.value * 100)}%`)
+            })
+            .on("mouseout", function(d) {
+                svg.select(".middleText").text(null)
+            })
+            .transition()
+            .ease(d3.easeLinear)
+            .duration(2000)
+            .attrTween("d",pieTween);
+
+            svg.append("text")
+            .attr("class", "middleText")
+            .attr("text-anchor", "middle");
+
+            function pieTween(b){
+                    b.innerRadius = 0;
+                    var i = d3.interpolate({startAngle:0,endAngle:0},b);
+                    return function(t) {return arc(i(t));};
+                }
+            
+            setTimeout(function(){
+                // Add the polylines between chart and labels:
+                svg
+                .selectAll('allPolylines')
+                .data(data_ready)
+                .join('polyline')
+                    .attr("stroke", "black")
+                    .style("fill", "none")
+                    .attr("stroke-width", 1)
+                    .attr('points', function(d) {
+                    const posA = arc.centroid(d) // line insertion in the slice
+                    const posB = outerArc.centroid(d) // line break: we use the other arc generator that has been built only for that
+                    const posC = outerArc.centroid(d); // Label position = almost the same as posB
+                    const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2 // we need the angle to see if the X position will be at the extreme right or extreme left
+                    posC[0] = radius * 0.95 * (midangle < Math.PI ? 1 : -1); // multiply by 1 or -1 to put it on the right or on the left
+                    return [posA, posB, posC]
+                    })
+                
+                // Add the polylines between chart and labels:
+                svg
+                .selectAll('allLabels')
+                .data(data_ready)
+                .join('text')
+                    .text(d => d.data[0])
+                    .attr('transform', function(d) {
+                        const pos = outerArc.centroid(d);
+                        const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+                        pos[0] = radius * 0.99 * (midangle < Math.PI ? 1 : -1);
+                        return `translate(${pos})`;
+                    })
+                    .style('text-anchor', function(d) {
+                        const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+                        return (midangle < Math.PI ? 'start' : 'end')
+                    })
+            }, 2000);
+		}
+		const createSvg8 = () => {
+			// set the dimensions and margins of the graph
+            const margin = {top: 25, right: 90, bottom: 30, left: 70},
+                width = 900 - margin.left - margin.right,
+                height = 500 - margin.top - margin.bottom;
+
+            // append the svg object to the body of the page
+            const svg = d3.select(".svg8")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform",`translate(${margin.left},${margin.top + 100})`);
+            
+            let title = svg.append('text')
+                .attr('class', 'title')
+                .attr('x', -10)
+                .attr('y', -60)
+                .html('Gasoline and Diesel Prices in US');
+
+            let subTitle = svg.append("text")
+                .attr("class", "subTitle")
+                .attr("y", -40)
+                .attr('x', -10)
+                .html("Price in USD");
+            //Read the data
+            // d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/connectedscatter.csv",
+            d3.csv("data/ppoo.csv",
+                // When reading the csv, I must format variables:
+                d => {
+                    return {date : d3.timeParse("%m/%d/%Y")(d.Date), value : d.Gasoline, value2 : d.Diesel}}).then(
+
+                // Now I can use this dataset:
+                function(data) {
+
+                    // Add X axis --> it is a date format
+
+                    const x = d3.scaleTime()
+                        .domain(d3.extent(data, d => d.date))
+                        .range([ 0, width ]);
+                    svg.append("g")
+                        .attr("transform", `translate(0, ${height - 100})`)
+                        .call(d3.axisBottom(x));
+
+                    // Add Y axis
+                    const y = d3.scaleLinear()
+                        .domain( [1, 4.5])
+                        .range([ height - 100, 0 ]);
+                    svg.append("g")
+                        .call(d3.axisLeft(y));
+
+                    // Add the line
+                    svg.append("path")
+                        .datum(data)
+                        .attr("fill", "none")
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 1.5)
+                        .attr("d", d3.line()
+                            .curve(d3.curveBasis) // Just add that to have a curve instead of segments
+                            .x(d => x(d.date))
+                            .y(d => y(d.value))
+                        )
+
+                    const subgroups = data.columns.slice(1)
+                    const color = d3.scaleOrdinal()
+                        .domain(subgroups)
+                        .range(['black','green']);
+
+                    // console.log('****'+color('Gasoline'))
+
+                    // Add the line
+                    svg.append("path")
+                        .datum(data)
+                        .attr("class", "myline")
+
+                        .attr("fill", "none")
+                        .attr("stroke", "green")
+                        .attr("stroke-width", 1.5)
+                        .attr("d", d3.line()
+                            .x(function(d) { return x(d.date) })
+                            .y(function(d) { return y(d.value) })
+                            .y(function(d) { return y(d.value2) })
+                        )
+                        .on('mouseover', mouseover)
+                        
+                    svg.append("text")
+                        .attr("class", "y label")
+                        .attr("text-anchor", "end")
+                        .attr("x", 50)
+                        .attr("y", height-430)
+                        .text("Price");
+
+                    svg.append("text")
+                        .attr("class", "x label")
+                        .attr("text-anchor", "end")
+                        .attr("x", width)
+                        .attr("y", height - 106)
+                        .text("Year");
+
+                    const size = 20
+                    svg.selectAll("myline")
+                        .data(subgroups)
+                        .join("rect")
+                        .attr("x", 620)
+                        .attr("y", function(d,i){ return 10 + i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
+                        .attr("width", size)
+                        .attr("height", size)
+                        .style("fill", function(d){ console.log(color(d))
+                            return color(d)})
+
+
+                    // Add one dot in the legend for each name.
+                    svg.selectAll("mylabels")
+                        .data(subgroups)
+                        .join("text")
+                        .attr("x", 620 + size*1.2)
+                        .attr("y", function(d,i){ return 10 + i*(size+5) + (size/2)}) // 100 is where the first dot appears. 25 is the distance between dots
+                        .style("fill", function(d){ return color(d)})
+                        .text(function(d){ return d})
+                        .attr("text-anchor", "left")
+                        .style("alignment-baseline", "middle")
+
+                })
+		}
+    
+        const createSvg9 = () => {
+            // set the dimensions and margins of the graph
+            const margin = {top: 10, right: 120, bottom: 20, left: 50},
+                    width = 650 - margin.left - margin.right,
+                    height = 500 - margin.top - margin.bottom;
+
+                // append the svg object to the body of the page
+                const svg = d3.select("#my_dataviz9")
+                    .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform",`translate(${margin.left},${margin.top + 100})`);
+
+                let title = svg.append('text')
+                .attr('class', 'title')
+                .attr('x', -20)
+                .attr('y', -50)
+                .html('Comparison of Oil Prices in Six U.S. Areas in 2021');
+
+                let subTitle = svg.append("text")
+                .attr("class", "subTitle")
+                .attr("y", -30)
+                .attr('x', -20)
+                .html("Price in USD");
+                // Parse the Data
+                d3.csv("data/price.csv").then( function(data) {
+
+                    // List of subgroups = header of the csv files = soil condition here
+                    const subgroups = data.columns.slice(1)
+
+                    // List of groups = species here = value of the first column called group -> I show them on the X axis
+                    const types = data.map(d => d.Type)
+
+                    // Add X axis
+                    const x = d3.scaleBand()
+                        .domain(types)
+                        .range([0, width - 40])
+                        .padding([0.2])
+                    svg.append("g")
+                        .attr("transform", `translate(0, ${height -100})`)
+                        .call(d3.axisBottom(x).tickSizeOuter(0));
+
+                    // Add Y axis
+                    const y = d3.scaleLinear()
+                        .domain([0, 30])
+                        .range([ height -100, 0 ]);
+                    svg.append("g")
+                        .call(d3.axisLeft(y));
+
+                    // color palette = one color per subgroup
+                    const color = d3.scaleOrdinal()
+                        .domain(subgroups)
+                        .range(d3.schemeBlues[6]);
+
+                    //stack the data? --> stack per subgroup
+                    const stackedData = d3.stack()
+                        .keys(subgroups)
+                        (data)
+
+
+
+
+                var tooltip = d3
+                .select("body")
+                .append("div")
+                .attr("class", "tooltip")
+                .style("opacity", 0);
+
+                function toCommas(value) {
+                return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }
+
+                const mouseOver = function(event, d) {
+
+                    const subgroupName = d3.select(this.parentNode).datum().key;
+                    const subgroupValue = d.data[subgroupName];
+                    
+                tooltip.transition()     
+                    //.duration(200)      
+                    .style("opacity", .9);      
+                    
+                tooltip.html(d.vessel_name)  
+                    .style("left", (event.pageX) + "px")     
+                    .style("top", (event.pageY - 48) + "px");     
+
+                    tooltip.html(
+                    `<strong>${subgroupName}</strong><br/>Oil: ${subgroupValue}`
+                    );
+                }
+
+                const mouseLeave = function(d) {
+                tooltip.transition()        
+                    .duration(500)      
+                    .style("opacity", 0); 
+                }
+                    // Show the bars
+                    svg.append("g")
+                        .selectAll("g")
+                        // Enter in the stack data = loop key per key = group per group
+                        .data(stackedData)
+                        .join("g")
+                        .attr("fill", d => color(d.key))
+                        .attr("class", d => "myRect " + d.key.split(' ')[0] )
+                        .selectAll("rect")
+                        // enter a second time = loop subgroup per subgroup to add all rectangles
+                        .data(d => d)
+                        .join("rect")
+                        .attr("x", d =>  x(d.data.Type))
+                        .attr("y", d => y(d[1]))
+                        .attr("height", d => y(d[0]) - y(d[1]))
+                        .attr("width",x.bandwidth())
+                        .attr("stroke", "grey")
+                        .on("mouseover", mouseOver)
+                        .on("mouseleave", mouseLeave)
+
+
+                    const size = 20
+                    svg.selectAll("myRect")
+                        .data(subgroups)
+                        .join("rect")
+                        .attr("x", 435)
+                        .attr("y", function(d,i){ return 10 + i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
+                        .attr("width", size)
+                        .attr("height", size)
+                        .style("fill", function(d){ return color(d)})
+
+
+                    // Add one dot in the legend for each name.
+                    svg.selectAll("mylabels")
+                        .data(subgroups)
+                        .join("text")
+                        .attr("x", 500 + size*1.2 - 65)
+                        .attr("y", function(d,i){ return 10 + i*(size+5) + (size/2)}) // 100 is where the first dot appears. 25 is the distance between dots
+                        .style("fill", function(d){ return color(d)})
+                        .text(function(d){ return d})
+                        .attr("text-anchor", "left")
+                        .style("alignment-baseline", "middle")
+
+                })
+        }
+
+		const OverToOver = () => {
+			window.location =  "OverViewPage.html";
+		}
+
+		const OverToUS = () => {
+			window.location =  "USPage.html";
+		}
+
+		createSvg5()
+		createSvg6()
+		createSvg7()
+		createSvg8()
+        createSvg9()
+	
+	</script>
+</html>

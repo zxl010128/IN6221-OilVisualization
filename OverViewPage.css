@@ -1,0 +1,204 @@
+
+body {
+	margin: 0;
+}
+.ntulogo {
+	height: 50px;
+}
+
+.footerBox {
+	display: flex; 
+	flex-direction: row; 
+	justify-content: space-between; 
+	width: 100%; 
+	margin: 10px auto;
+	padding: 0 20px 10px 30px;
+}
+
+.sign {
+	font-size: 20px;
+	margin-left: 0px;
+	font-family: 'Lucida Grande';
+	font-weight: 700
+}
+
+.footerLeft {
+	display: flex;
+	flex-direction: column;
+	margin-left: 20px;
+}
+
+.footerleftarea {
+	display: flex;
+	flex-direction: row;
+	font-size: 15px;
+	align-items: center;
+	font-family: 'Lucida Grande';
+}
+
+.gameviewLogo {
+	width: 80px;
+	margin-top: 20px;
+}
+
+.contentContainer {
+	width: 100%;
+	background-color: #E8E3D9;
+	display: flex;
+	flex-direction: column;
+
+}
+
+.overviewtitle {
+	margin: 50px auto;
+	font-size: 50px;
+	font-weight: 900;
+}
+
+.node circle {
+	stroke: #3a403d;
+	stroke-width: .5px;
+}
+
+text{
+	font-size: 16px;
+	font-family: Open Sans, sans-serif;
+}
+
+text.title{
+	font-size: 24px;
+	font-weight: 500;
+}
+text.subTitle{
+	font-size: 14px;
+	font-weight: 300;
+	fill: #777777;
+}
+
+text.caption{
+	font-weight: 400;
+	font-size: 14px;
+	fill: #777777;
+ }
+ text.label{
+	font-weight: 600;
+ }
+
+ text.valueLabel{
+	font-weight: 300;
+ }
+
+ text.yearText{
+	font-size: 64px;
+	font-weight: 700;
+	opacity: 0.25;
+ }
+ .tick text {
+	fill: #777777;
+ }
+ .xAxis .tick:nth-child(2) text {
+	text-anchor: start;
+ }
+ .tick line {
+	shape-rendering: CrispEdges;
+	stroke: #dddddd;
+ }
+ .tick line.origin{
+	stroke: #aaaaaa;
+ }
+ path.domain{
+	display: none;
+ }
+
+div.tooltip {     
+	position: absolute;         
+	text-align: center;         
+	width: 150px;                    
+	height: 30px;                   
+	padding: 2px;               
+	font: 12px sans-serif;      
+	background: white; 
+	border: 0px;        
+	border-radius: 8px;         
+	pointer-events: none;           
+}
+
+.slider {
+	margin-top: 20px;
+	-webkit-appearance: none;
+	width: 80%;
+	height: 15px;
+	border-radius: 5px;  
+	background: #d3d3d3;
+	outline: none;
+	opacity: 0.7;
+	-webkit-transition: .2s;
+	transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 25px;
+	height: 25px;
+	border-radius: 50%; 
+	background: #003c7d;
+	cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+	width: 25px;
+	height: 25px;
+	border-radius: 50%;
+	background: #003c7d;
+	cursor: pointer;
+}
+
+#output {
+	font-size: 20px;
+	margin: 0 0 0 5px;
+}
+
+.svg1 {
+	margin-top: 50px;
+	margin-bottom: 50px;
+	width: 1200px; 
+	height: 880px; 
+	background-color: white;
+	align-self: center;
+	padding: 60px 60px 60px 200px;
+	border-radius: 20px;
+	box-shadow: 5px 5px 10px -4px black;
+}
+
+.svg2 {
+	width: 1200px; 
+	height: 880px; 
+	background-color: white;
+	align-self: center;
+	padding: 130px 60px 60px 100px;
+	border-radius: 20px;
+	box-shadow: 5px 5px 10px -4px black;
+}
+
+.svg3 {
+	margin-top: 50px;
+	width: 1200px; 
+	height: 880px; 
+	background-color: white;
+	align-self: center;
+	padding: 60px 60px 60px 140px;
+	border-radius: 20px;
+	box-shadow: 5px 5px 10px -4px black;
+}
+
+.svg4 {
+	margin-bottom: 50px;
+	width: 1200px; 
+	height: 880px; 
+	background-color: white;
+	align-self: center;
+	padding: 60px 60px 60px 60px;
+	border-radius: 20px;
+	box-shadow: 5px 5px 10px -4px black;
+}

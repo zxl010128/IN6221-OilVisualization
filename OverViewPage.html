@@ -1,0 +1,786 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href="/OverViewPage.css" rel="stylesheet" type="text/css">
+		<meta charset="UTF-8">
+		<title>OilView</title>
+	</head>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+	<!-- JavaScript Bundle with Popper -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+	<script src="https://d3js.org/d3.v7.min.js"></script> 
+ 	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.24.0/d3-legend.js"></script>
+
+	<body>
+		
+		<nav class="navbar navbar-expand-lg" style="width: 100%; background-color: #063273;">
+			<div class="container-fluid">
+				<a class="navbar-brand" style="color: white;" >Navbar</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+				<div class="navbar-nav" >
+					<a class="nav-link" style="color: white; cursor: pointer" onclick="OverToOver()">OverView</a>
+					<a class="nav-link" style="color: white; cursor: pointer" onclick="OverToUS()">U.S</a>
+				</div>
+				</div>
+			</div>
+		</nav>
+
+		<div class="contentContainer">
+			<h3 class="overviewtitle">
+				Overview of the overall world oil information 
+			</h3>
+			<div class="svg4"></div>
+
+			<div class="svg2"></div>
+			<div class="svg3">
+				<svg id="my_dataviz3" width="1000" height="750"></svg>
+			</div>
+
+			<div class="svg1">
+				<svg id="my_dataviz1" width="800" height="750"></svg>
+				<div class="slidecontainer">
+					<input type="range" min="1980" max="2020" value="1980" class="slider" id="myRange">
+					<output id="output">1980</output>
+				</div>
+			</div>
+
+			
+
+		</div>
+
+			<nav class="navbar" style="width: 100%; background-color: #063273; color: white; padding-top: 10px">
+				<div class="container-fluid" style="display: flex; flex-direction: column;">
+				  <hr style="width:98%; align-self: center; background-color: white; border: 0; border-bottom: 4px solid white; margin: 4px 0">
+				  <div class="footerBox">
+					  <div class="footerleftarea">
+						  <img src="/icons/NTU_Logo.png" class="ntulogo" />
+						  <div class="footerLeft">
+							  <span class="sign">
+									WKWSCI IN6221 Team 2
+							  </span>
+							  <span style="margin-top: 15px">Zhang Xinlei</span>
+							  <span>Ma Wei</span>
+							  <span>Long Yu</span>
+							  <span>Chen Yunyi</span>
+						  </div>
+	  
+					  </div>	
+				  </div>
+	  
+				</div>
+			  </nav>
+		</div>
+		
+		
+	
+	</body>
+
+	<script>
+
+		const createSvg1 = () => {
+
+			const svg = d3.select("#my_dataviz1"),
+			width = +svg.attr("width"),
+			height = +svg.attr("height");
+		
+			let title = svg.append('text')
+			.attr('class', 'title')
+			.attr('y', 24)
+			.html('Oil Reserves, From 1980 to 2020');
+		
+			let subTitle = svg.append("text")
+			.attr("class", "subTitle")
+			.attr("y", 45)
+			.html("Oil reservation is measured in tons per year");
+		
+			// Map and projection
+			const path = d3.geoPath();
+			
+			const projection = d3.geoMercator()
+			.scale(100) 
+			.center([0,20])
+			.translate([width / 2, height / 2 - 50]);
+		
+			// Data and color scale
+			let data = new Map()
+			
+			const colorScale = d3.scaleThreshold()
+			.domain([1, 100000000, 300000000, 1000000000, 3000000000, 10000000000, 30000000000, 100000000000])
+			.range(d3.schemeBlues[7]);
+		
+			var tooltip = d3
+			.select("body")
+			.append("div")
+			.attr("class", "tooltip")
+			.style("opacity", 0);
+		
+			function toCommas(value) {
+			return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+			}
+		
+			let is_first = true;
+		
+			const mouseOver = function(d, i) {
+			d3.selectAll(".Country")
+				.transition()
+				//.duration(200)
+				.style("opacity", .5)
+				.style("stroke", "transparent")
+		
+			d3.select(this)
+				.transition()
+				//.duration(200)
+				.style("opacity", 1)
+				.style("stroke", "black")
+				
+			tooltip.transition()     
+				//.duration(200)      
+				.style("opacity", .9);      
+				
+			tooltip.html(d.vessel_name)  
+				.style("left", (event.pageX) + "px")     
+				.style("top", (event.pageY - 48) + "px");     
+				
+			if (i.total !== 0) {
+				tooltip.html(
+				`<strong>${i.properties.name}</strong><br/>Oil: ${toCommas(parseInt(i.total))} tonnes`
+				);
+			} else {
+				tooltip.html(
+				`<strong>${i.properties.name}</strong><br/>No Information`
+				);
+			} 
+			}
+		
+			const mouseLeave = function(d) {
+			d3.selectAll(".Country")
+				.transition()
+				//.duration(200)
+				.style("opacity", 1)
+				.style("stroke", "transparent")
+			
+			d3.select(this)
+				.transition()
+				//.duration(200)
+				.style("opacity", 1)
+				.style("stroke", "transparent")
+				
+			tooltip.transition()        
+				.duration(500)      
+				.style("opacity", 0); 
+			} 
+			
+			const addLegend = () => {
+			var g = svg.append("g")
+				.attr("class", "legendThreshold") 
+				.attr("transform", "translate(20,700)");
+		
+				var labels = ['No Info', '1', '100 million', '300 million', '1 billion', '3 billion', '10 billion', '30 billion', '100 billion', ];
+				var legend = d3.legendColor()
+				.labels(function (d) { return labels[d.i]; })
+				.shapeWidth(100)
+				.shapePadding(0)
+				.orient('horizontal')
+				.scale(colorScale)
+				.labelAlign('start')
+				
+				svg.select(".legendThreshold")
+				.call(legend);
+			}
+		
+			const drawWorldMapWithYear = async (year) => {
+			data.clear()
+			
+			Promise.all([
+				d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"),
+				d3.csv("data/oil-proved-reserves.csv", function(d) {
+					if (d.Code !== "" && d.Year == year) {
+					data.set(d.Code, d['Oil - Proved reserves'])
+					}
+				})
+			
+			]).then(function(loadData){
+				let topo = loadData[0]
+				
+				if (is_first) {
+					svg.append("g")
+					.selectAll("path")
+					.data(topo.features)
+					.join("path")
+					
+					.attr("d", d3.geoPath()
+					.projection(projection)
+					)
+					.attr("fill", function (d) {
+						d.total = data.get(d.id) || 0;
+						return colorScale(d.total);
+					})
+		
+					.attr("class", function(d){ return "Country" } )
+		
+					.style("opacity", 1)
+		
+					.on("mouseover", mouseOver)
+					
+					.on("mouseout", mouseLeave)
+					is_first = false;
+				} else {
+					d3.select("#my_dataviz1").selectAll('g').remove();
+					d3.select("#my_dataviz1").selectAll('d').remove();
+					d3.select("#my_dataviz1").selectAll('fill').remove();
+		
+					svg.append("g")
+					.selectAll("path")
+					.data(topo.features)
+					.join("path")
+					
+					.attr("d", d3.geoPath()
+					.projection(projection)
+					)
+		
+					.attr("fill", function (d) {
+						d.total = data.get(d.id) || 0;
+						return colorScale(d.total);
+					})
+		
+					.attr("class", function(d){ return "Country" } )
+					.style("opacity", 1)
+		
+					.on("mouseover", mouseOver)
+					
+					.on("mouseout", mouseLeave)
+				}
+				addLegend()
+				
+				})
+			
+			
+			}
+		
+			drawWorldMapWithYear(1980);
+			
+			document.getElementById("myRange").addEventListener("input", async () => {
+				var val = document.getElementById("myRange").value
+				drawWorldMapWithYear(val)
+				document.getElementById('output').innerHTML = val
+			})
+
+		}
+
+		const createSvg2 = () => {
+			var svg = d3.select(".svg2").append("svg")
+			.attr("width", 960)
+			.attr("height", 600);
+
+			var tickDuration = 2000;
+
+			var top_n = 12;
+			var height = 600;
+			var width = 960;
+
+			const margin = {
+			top: 80,
+			right: 0,
+			bottom: 5,
+			left: 0
+			};
+
+			let barPadding = (height-(margin.bottom+margin.top))/(top_n*5);
+
+			let title = svg.append('text')
+			.attr('class', 'title')
+			.attr('y', 24)
+			.html('Oil Production, From 1980 to 2020');
+
+			let subTitle = svg.append("text")
+			.attr("class", "subTitle")
+			.attr("y", 45)
+			.html("Oil consumption is measured in terawatt-hour (TWh) equivalents per year.");
+
+			let caption = svg.append('text')
+			.attr('class', 'caption')
+			.attr('x', width)
+			.attr('y', height-5)
+			.style('text-anchor', 'end')
+
+			let year = 1980;
+
+			d3.csv('data/oil-production-by-country.csv').then(function(data) {
+			//if (error) throw error;
+
+			data.forEach(d => {
+				d.production = +d.production,
+					d.last_year_production = +d.last_year_production,
+					d.production = isNaN(d.production) ? 0 : d.production,
+					d.year = +d.year,
+					d.colour = d3.hsl(Math.random()*360,0.75,0.75)
+			});
+
+
+			let yearSlice = data.filter(d => d.year == year && !isNaN(d.production))
+				.sort((a,b) => b.production - a.production)
+				.slice(0, top_n);
+
+			yearSlice.forEach((d,i) => d.ranking = i);
+
+			// console.log('yearSlice: ', yearSlice)
+
+			let x = d3.scaleLinear()
+				.domain([0, d3.max(yearSlice, d => d.production)])
+				.range([margin.left, width-margin.right-65]);
+
+			let y = d3.scaleLinear()
+				.domain([top_n, 0])
+				.range([height-margin.bottom, margin.top]);
+
+			let xAxis = d3.axisTop()
+				.scale(x)
+				.ticks(width > 500 ? 5:2)
+				.tickSize(-(height-margin.top-margin.bottom))
+				.tickFormat(d => d3.format(',')(d));
+
+			svg.append('g')
+				.attr('class', 'axis xAxis')
+				.attr('transform', `translate(0, ${margin.top})`)
+				.call(xAxis)
+				.selectAll('.tick line')
+				.classed('origin', d => d == 0);
+
+			svg.selectAll('rect.bar')
+				.data(yearSlice, d => d.Entity)
+				.enter()
+				.append('rect')
+				.attr('class', 'bar')
+				.attr('x', x(0)+1)
+				.attr('width', d => x(d.production)-x(0)-1)
+				.attr('y', d => y(d.ranking)+5)
+				.attr('height', y(1)-y(0)-barPadding)
+				.style('fill', d => d.colour);
+
+			svg.selectAll('text.label')
+				.data(yearSlice, d => d.Entity)
+				.enter()
+				.append('text')
+				.attr('class', 'label')
+				.attr('x', d => x(d.production)-8)
+				.attr('y', d => y(d.ranking)+5+((y(1)-y(0))/2)+1)
+				.style('text-anchor', 'end')
+				.html(d => d.Entity);
+
+			svg.selectAll('text.valueLabel')
+				.data(yearSlice, d => d.Entity)
+				.enter()
+				.append('text')
+				.attr('class', 'valueLabel')
+				.attr('x', d => x(d.production)+5)
+				.attr('y', d => y(d.ranking)+5+((y(1)-y(0))/2)+1)
+				.text(d => d3.format(',.0f')(d.last_year_production));
+
+			let yearText = svg.append('text')
+				.attr('class', 'yearText')
+				.attr('x', width-margin.right)
+				.attr('y', height-25)
+				.style('text-anchor', 'end')
+				.html(~~year)
+				.call(halo, 10);
+
+			let ticker = d3.interval(e => {
+
+				yearSlice = data.filter(d => d.year == year && !isNaN(d.production))
+					.sort((a,b) => b.production - a.production)
+					.slice(0,top_n);
+
+				yearSlice.forEach((d,i) => d.ranking = i);
+
+				// console.log('IntervalYear: ', yearSlice);
+
+				x.domain([0, d3.max(yearSlice, d => d.production)]); 
+
+				svg.select('.xAxis')
+					.transition()
+					.duration(tickDuration)
+					.ease(d3.easeLinear)
+					.call(xAxis);
+
+				let bars = svg.selectAll('.bar').data(yearSlice, d => d.Entity);
+
+				bars
+					.enter()
+					.append('rect')
+					.attr('class', d => `bar ${d.Entity.replace(/\s/g,'_')}`)
+					.attr('x', x(0)+1)
+					.attr( 'width', d => x(d.production)-x(0)-1)
+					.attr('y', d => y(top_n+1)+5)
+					.attr('height', y(1)-y(0)-barPadding)
+					.style('fill', d => d.colour)
+					.transition()
+					.duration(tickDuration)
+					.ease(d3.easeLinear)
+					.attr('y', d => y(d.ranking)+5);
+
+				bars
+					.transition()
+					.duration(tickDuration)
+					.ease(d3.easeLinear)
+					.attr('width', d => x(d.production)-x(0)-1)
+					.attr('y', d => y(d.ranking)+5);
+
+				bars
+					.exit()
+					.transition()
+					.duration(tickDuration)
+					.ease(d3.easeLinear)
+					.attr('width', d => x(d.production)-x(0)-1)
+					.attr('y', d => y(top_n+1)+5)
+					.remove();
+
+				let labels = svg.selectAll('.label')
+					.data(yearSlice, d => d.Entity);
+
+				labels
+					.enter()
+					.append('text')
+					.attr('class', 'label')
+					.attr('x', d => x(d.production)-8)
+					.attr('y', d => y(top_n+1)+5+((y(1)-y(0))/2))
+					.style('text-anchor', 'end')
+					.html(d => d.Entity)    
+					.transition()
+					.duration(tickDuration)
+					.ease(d3.easeLinear)
+					.attr('y', d => y(d.ranking)+5+((y(1)-y(0))/2)+1);
+
+
+				labels
+					.transition()
+					.duration(tickDuration)
+					.ease(d3.easeLinear)
+					.attr('x', d => x(d.production)-8)
+					.attr('y', d => y(d.ranking)+5+((y(1)-y(0))/2)+1);
+
+				labels
+					.exit()
+					.transition()
+					.duration(tickDuration)
+					.ease(d3.easeLinear)
+					.attr('x', d => x(d.production)-8)
+					.attr('y', d => y(top_n+1)+5)
+					.remove();
+
+
+
+				let valueLabels = svg.selectAll('.valueLabel').data(yearSlice, d => d.Entity);
+
+				valueLabels
+					.enter()
+					.append('text')
+					.attr('class', 'valueLabel')
+					.attr('x', d => x(d.production)+5)
+					.attr('y', d => y(top_n+1)+5)
+					.text(d => d3.format(',.0f')(d.last_year_production))
+					.transition()
+					.duration(tickDuration)
+					.ease(d3.easeLinear)
+					.attr('y', d => y(d.ranking)+5+((y(1)-y(0))/2)+1);
+
+				valueLabels
+					.transition()
+					.duration(tickDuration)
+					.ease(d3.easeLinear)
+					.attr('x', d => x(d.production)+5)
+					.attr('y', d => y(d.ranking)+5+((y(1)-y(0))/2)+1)
+					.tween("text", function(d) {
+						let i = d3.interpolateRound(d.last_year_production, d.production);
+						return function(t) {
+						this.textContent = d3.format(',')(i(t));
+						};
+					});
+
+				valueLabels
+					.exit()
+					.transition()
+					.duration(tickDuration)
+					.ease(d3.easeLinear)
+					.attr('x', d => x(d.production)+5)
+					.attr('y', d => y(top_n+1)+5)
+					.remove();
+
+				yearText.html(~~year);
+
+				if(year == 2020) ticker.stop();
+				year = d3.format('.1f')((+year) + 1);
+
+			},tickDuration);
+
+			});
+
+			const halo = function(text, strokeWidth) {
+			text.select(function() { return this.parentNode.insertBefore(this.cloneNode(true), this); })
+				.style('fill', '#ffffff')
+				.style('stroke','#ffffff')
+				.style('stroke-width', strokeWidth)
+				.style('stroke-linejoin', 'round')
+				.style('opacity', 1);
+
+			}   
+
+		}
+
+		const createSvg3 = () => {
+			// set the dimensions and margins of the graph
+			const margin = {top: 10, right: 30, bottom: 30, left: 60},
+					width = 900 - margin.left - margin.right,
+					height = 700 - margin.top - margin.bottom;
+
+			// append the svg object to the body of the page
+			const svg = d3.select("#my_dataviz3")
+					.append("svg")
+					.attr("width", width + margin.left + margin.right)
+					.attr("height", height + margin.top + margin.bottom)
+					.append("g")
+					.attr("transform", `translate(${margin.left},${margin.top + 100})`);
+
+			let title = svg.append('text')
+				.attr('class', 'title')
+				.attr('x', 0)
+				.attr('y', -50)
+				.html('Brent Oil Prices(Dollars per Barrel) since 2000');
+
+				let subTitle = svg.append("text")
+				.attr("class", "subTitle")
+				.attr("y", -30)
+				.attr('x', 0)
+				.html("Price in USD");
+
+			//Read the data
+			// d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/3_TwoNumOrdered_comma.csv",
+			d3.csv("data/BrentOilPrices.csv",
+				d => {
+					return {date : d3.timeParse("%d-%b-%y")(d.date), value : d.value}}).then(
+					// When reading the csv, I must format variables:
+					// function(d){
+					//   return { date : d3.timeParse("%d-%b-%y " +
+					//           "" +
+					//           "" +
+					//           "")(d.date), value : d.value }
+					// }).then(
+
+					// Now I can use this dataset:
+					function(dataList) {
+
+						// Add X axis --> it is a date format
+						const x = d3.scaleTime()
+								.domain(d3.extent(dataList, function(d) { return d.date; }))
+								.range([ 0, width ]);
+						svg.append("g")
+								.attr("transform", `translate(0, ${height - 100})`)
+								.call(d3.axisBottom(x));
+
+						// Max value observed:
+						const max = d3.max(dataList, function(d) { return +d.value; })
+
+						// Add Y axis
+						const y = d3.scaleLinear()
+								.domain([0, 150])
+								.range([ height - 100, 0 ]);
+						svg.append("g")
+								.call(d3.axisLeft(y));
+
+						// Set the gradient
+						svg.append("linearGradient")
+								.attr("id", "line-gradient")
+								.attr("gradientUnits", "userSpaceOnUse")
+								.attr("x1", 0)
+								.attr("y1", y(0))
+								.attr("x2", 0)
+								.attr("y2", y(max))
+								.selectAll("stop")
+								.data([
+								{offset: "0%", color: "green"},
+								{offset: "100%", color: "red"}
+								])
+								.enter().append("stop")
+								.attr("offset", function(d) { return d.offset; })
+								.attr("stop-color", function(d) { return d.color; });
+
+						// Add the line
+						let path = svg.append("path")
+								.datum(dataList)
+								.attr("fill", "none")
+								.attr("stroke", "url(#line-gradient)" )
+								.attr("stroke-width", 2)
+								.attr("d", d3.line()
+										.x(function(d) { return x(d.date) })
+										.y(function(d) { return y(d.value) })
+								)
+
+						var totalLength = path.node().getTotalLength();
+
+						path
+						.attr("stroke-dasharray", totalLength + " " + totalLength)
+						.attr("stroke-dashoffset", totalLength)
+						.transition()
+							.duration(4000)
+							.ease(d3.easeLinear)
+							.attr("stroke-dashoffset", 0)
+
+						svg.append("text")
+							.attr("class", "x label")
+							.attr("text-anchor", "end")
+							.attr("x", width)
+							.attr("y", height - 6)
+							.text("Year");
+
+						svg.append("text")
+							.attr("class", "y label")
+							.attr("text-anchor", "end")
+							.attr("y", 6)
+							.attr("dy", ".75em")
+							.attr("transform", "rotate(-90)")
+							.text("Brent Oil Prices(Dollars per Barrel)");
+
+					})
+		}
+		const createSvg4 = () => {
+			var width = 1200, height = 880, sizeDivisor = 40, nodePadding = 5;
+
+			var svg = d3.select(".svg4")
+				.append("svg")
+				.attr("width", width)
+				.attr("height", height);
+
+			let title = svg.append('text')
+			.attr('class', 'title')
+			.attr('y', 24)
+			.html('Oil Consumption in 2021');
+
+			let subTitle = svg.append("text")
+			.attr("class", "subTitle")
+			.attr("y", 45)
+			.html("Oil consumption is measured in terawatt-hour (TWh) equivalents per year.");
+
+			var simulation = d3.forceSimulation()
+				.force("forceX", d3.forceX().strength(.1).x(width * .5))
+				.force("forceY", d3.forceY().strength(.1).y(height * .5))
+				.force("center", d3.forceCenter().x(width * .5).y(height * .5))
+				.force("charge", d3.forceManyBody().strength(-15));
+
+			var tooltip = d3
+			.select("body")
+			.append("div")
+			.attr("class", "tooltip")
+			.style("opacity", 0);
+
+			function toCommas(value) {
+			return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+			}
+
+			const mouseOver = function(d, i) {
+				
+			tooltip.transition()     
+				//.duration(200)      
+				.style("opacity", .9);      
+				
+			tooltip.html(d.vessel_name)  
+				.style("left", (event.pageX) + "px")     
+				.style("top", (event.pageY - 48) + "px");     
+
+			if (i.total !== 0) {
+				tooltip.html(
+				`<strong>${i.Entity}</strong><br/>Oil: ${toCommas(parseInt(i.OilConsumption))} TWh`
+				);
+			} else {
+				tooltip.html(
+				`<strong>${i.Entity}</strong><br/>No Information`
+				);
+			} 
+			}
+
+			const mouseLeave = function(d) {
+			tooltip.transition()        
+				.duration(500)      
+				.style("opacity", 0); 
+			}
+		
+			d3.csv("data/oil-consumption-by-country.csv", types).then(function(graph){
+
+			graph = graph.filter(d => d.Year == 2021 && d.CountryCode !== "")
+			graph = graph.sort(function(a,b){ return b.size - a.size; });
+
+			simulation
+				.nodes(graph)
+				.force("collide", d3.forceCollide().strength(.5).radius(function(d){ return d.radius + nodePadding; }).iterations(1))
+				.on("tick", function(d){
+					d3.selectAll("circle")
+						.attr("cx", function(d){ return d.x; })
+						.attr("cy", function(d){ return d.y; })
+				});
+
+			addFlagDefinitions(graph)
+			
+			var node = svg.append("g")
+				.attr("class", "node")
+				.selectAll("circle")
+				.data(graph)
+				.enter().append("circle")
+				.attr("r", function(d) { return d.radius; })
+				.attr("cx", function(d){ return d.x; })
+				.attr("cy", function(d){ return d.y; }) 
+				.attr("fill", function(d) {
+					return "url(#" + d.CountryCode + ")";
+				})
+				.on("mouseover", mouseOver)
+					
+				.on("mouseout", mouseLeave);
+
+			});
+
+			function addFlagDefinitions(graph) {
+			var defs = svg.append("defs");
+			defs.selectAll(".flag")
+				.data(graph)
+				.enter()
+				.append("pattern")
+				.attr("id", function(d) { return d.CountryCode; })
+				.attr("class", "flag")
+				.attr("width", "100%")
+				.attr("height", "100%")
+				.attr("patternContentUnits", "objectBoundingBox")
+					.append("image")
+					.attr("width", 1)
+					.attr("height", 1)
+					// xMidYMid: center the image in the circle
+					// slice: scale the image to fill the circle
+					.attr("preserveAspectRatio", "xMidYMid slice")
+					.attr("xlink:href", function(d) {
+					return "flags/" + d.CountryCode + ".svg";
+					});
+			}
+
+			function types(d){
+			d.OilConsumption = +d.OilConsumption;
+			d.size = +d.OilConsumption / sizeDivisor;
+			d.size < 3 ? d.radius = 3 : d.radius = d.size;
+			return d;
+			}
+		}
+
+		const OverToOver = () => {
+			window.location =  "OverViewPage.html";
+		}
+
+		const OverToUS = () => {
+			window.location =  "USPage.html";
+		}
+
+		createSvg1()
+		createSvg2()
+		createSvg3()
+		createSvg4()
+	
+	</script>
+</html>
