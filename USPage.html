@@ -614,7 +614,7 @@
                 .html("Price in USD");
             //Read the data
             // d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/connectedscatter.csv",
-            d3.csv("data/ppoo.csv",
+            d3.csv("data/gasoline-diesel.csv",
                 // When reading the csv, I must format variables:
                 d => {
                     return {date : d3.timeParse("%m/%d/%Y")(d.Date), value : d.Gasoline, value2 : d.Diesel}}).then(
